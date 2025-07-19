@@ -7,14 +7,12 @@ using UnityEngine.SceneManagement;
 /// <summary>
 /// リザルト画面(UIページ画面)
 /// </summary>
-public class ResultScreen : UIPageMove
+public class ResultScreen : TextColorChange
 {
     protected SetClearConditions setClearConditions;
 
     [Header("フェードアウト用のアニメーション、上のものは入れなくて大丈夫")]
     [SerializeField] protected Animator fadeOutAnimator;
-    protected static readonly Color32 highlightColor = new Color32(255, 130, 130, 255);//テキストの上に置いたら少し赤っぽい色に
-    protected static readonly Color32 defaultColor = new Color32(0, 0, 0, 255);//テキストから外れた時
 
     protected float stageNum;
     protected float fadeOutWaitTime = 0.5f;
@@ -24,20 +22,20 @@ public class ResultScreen : UIPageMove
         setClearConditions = GetComponent<SetClearConditions>();
         stageNum = setClearConditions.StageIndexNum;
         SetUpTextEvent(GameResult.Instance.ResultNextSceneTMP.gameObject, //次のステージへ
-                        (eventData) => { StartColorChange(GameResult.Instance.ResultNextSceneTMP, highlightColor); },
-                        (eventData) => { StartColorChange(GameResult.Instance.ResultNextSceneTMP, defaultColor); },
+                        (eventData) => { ChangeBlackText(GameResult.Instance.ResultNextSceneTMP); },
+                        (eventData) => { ResetBlackText(GameResult.Instance.ResultNextSceneTMP); },
                         (eventData) => {
                             StartCoroutine(ChangeScene($"Stage{stageNum + 1}"));
                         });
         SetUpTextEvent(GameResult.Instance.ResultOneMoreTimeTMP.gameObject, //もう一度同じステージ
-                        (eventData) => { StartColorChange(GameResult.Instance.ResultOneMoreTimeTMP, highlightColor); },
-                        (eventData) => { StartColorChange(GameResult.Instance.ResultOneMoreTimeTMP, defaultColor); },
+                        (eventData) => { ChangeBlackText(GameResult.Instance.ResultOneMoreTimeTMP); },
+                        (eventData) => { ResetBlackText(GameResult.Instance.ResultOneMoreTimeTMP); },
                         (eventData) => {
                             StartCoroutine(ChangeScene($"Stage{stageNum}"));
                         });
         SetUpTextEvent(GameResult.Instance.ResultTitleTMP.gameObject, //タイトルへ戻る
-                        (eventData) => { StartColorChange(GameResult.Instance.ResultTitleTMP, highlightColor); },
-                        (eventData) => { StartColorChange(GameResult.Instance.ResultTitleTMP, defaultColor); },
+                        (eventData) => { ChangeBlackText(GameResult.Instance.ResultTitleTMP); },
+                        (eventData) => { ResetBlackText(GameResult.Instance.ResultTitleTMP); },
                         (eventData) => {
                             StartCoroutine(ChangeScene("Title"));
                         });
@@ -45,6 +43,7 @@ public class ResultScreen : UIPageMove
 
     protected IEnumerator ChangeScene(string _stage)
     {
+        SoundManager.Instance.PlaySE(SESource.riceCakeUnionAndButton);
         fadeOutAnimator.SetBool("FadeOut",true);
         yield return new WaitForSeconds(fadeOutWaitTime);
         SceneManager.LoadScene(_stage);

@@ -23,20 +23,20 @@ public class PauseScreen : ResultScreen
     new void Start()
     {
         SetUpTextEvent(backGameTMP.gameObject, //ゲーム画面に戻る
-                        (eventData) => { StartColorChange(backGameTMP, highlightColor); },
-                        (eventData) => { StartColorChange(backGameTMP, defaultColor); },
+                        (eventData) => { ChangeBlackText(backGameTMP); },
+                        (eventData) => { ResetBlackText(backGameTMP); },
                         (eventData) => {
                             ClosePausePage();
                         });
         SetUpTextEvent(retryGameTMP.gameObject, //もう一度同じステージ
-                        (eventData) => { StartColorChange(retryGameTMP, highlightColor); },
-                        (eventData) => { StartColorChange(retryGameTMP, defaultColor); },
+                        (eventData) => { ChangeBlackText(retryGameTMP); },
+                        (eventData) => { ResetBlackText(retryGameTMP); },
                         (eventData) => {
                             StartCoroutine(ChangeScene(SceneManager.GetActiveScene().name));
                         });
         SetUpTextEvent(backTitleTMP.gameObject, //タイトルへ戻る
-                        (eventData) => { StartColorChange(backTitleTMP, highlightColor); },
-                        (eventData) => { StartColorChange(backTitleTMP, defaultColor); },
+                        (eventData) => { ChangeBlackText(backTitleTMP); },
+                        (eventData) => { ResetBlackText(backTitleTMP); },
                         (eventData) => {
                             StartCoroutine(ChangeScene("Title"));
                         });
@@ -54,6 +54,8 @@ public class PauseScreen : ResultScreen
     {
         fadeOutAnimator.SetBool("DisplayUI", true);
         GameStateMachine.Instance.SetState(GameStateMachine.GameState.Pause);
+
+        SoundManager.Instance.PlaySE(SESource.riceCakeUnionAndButton);
     }
     /// <summary>
     /// ポーズ画面を閉じる
@@ -62,6 +64,8 @@ public class PauseScreen : ResultScreen
     {
         fadeOutAnimator.SetBool("DisplayUI", false);
         GameStateMachine.Instance.SetState(GameStateMachine.GameState.Playing);
+
+        SoundManager.Instance.PlaySE(SESource.backButton);
     }
     private void SetUpPauseImageEvent(GameObject _image, UnityAction<BaseEventData> _enterAction, UnityAction<BaseEventData> _exitAction, UnityAction<BaseEventData> _clickAction)
     {

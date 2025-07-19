@@ -8,14 +8,11 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// タイトルUIでページを変える時の処理
 /// </summary>
-public class UIPageMove : MonoBehaviour
+public class UIPageMove : TextColorChange
 {
     [Header("ページに移るためのテキスト")]
     [SerializeField] protected TextMeshProUGUI movePageText;
-    protected float colorChangeDuration = 0.1f;
-    private string textColor = "FaceColor";
-    private static readonly Color32 highlightColor = new Color32(255, 130, 130, 255);//テキストの上に置いたら少し赤っぽい色に
-    private static readonly Color32 defaultColor = new Color32(255, 255, 255, 255);//テキストから外れた時
+
     //テキストをクリックした際に実行する関数
     protected UnityAction<BaseEventData> movePage;
 
@@ -26,7 +23,6 @@ public class UIPageMove : MonoBehaviour
     [SerializeField] protected GameObject leftArrow;  //左矢印
     [Header("ひとつ前に戻るテキスト")]
     [SerializeField] protected TextMeshProUGUI backPageText;
-    private static readonly Color32 backTextDefaultColor = new Color32(0,0,0,255);
 
     private float arrowMoveSpeed = 25f; //矢印が上下に動く速さ
 
@@ -35,12 +31,12 @@ public class UIPageMove : MonoBehaviour
 
     private Vector3 initialArrowPos; //マウスから抜けたときに元の位置に戻す
 
-    private Coroutine currentColorChangeCoroutine; //現在実行中の色が変わるアニメーションコルーチン
     private Coroutine currentArrowAnimation; // 現在実行中の矢印アニメーションコルーチン
 
     // Start is called before the first frame update
-    protected virtual void Start()
+    protected override void Start()
     {
+
         rightArrow.SetActive(false);
         leftArrow.SetActive(false);
 
@@ -49,7 +45,7 @@ public class UIPageMove : MonoBehaviour
         SetUpArrowEvent(rightArrow,
                         (eventData) => { currentArrowAnimation = StartCoroutine(ArrowEnter(rightArrow)); },
                         (eventData) => { ArrowExit(rightArrow); },
-                        (eventData) => { TurnThePage(); ArrowExit(rightArrow);});
+                        (eventData) => { TurnThePage(); ArrowExit(rightArrow); });
         //ページを戻す矢印
         SetUpArrowEvent(leftArrow,
                         (eventData) => { currentArrowAnimation = StartCoroutine(ArrowEnter(leftArrow)); },
@@ -57,69 +53,23 @@ public class UIPageMove : MonoBehaviour
                         (eventData) => { GoBackPage(); ArrowExit(leftArrow); });
         //ページを開くテキスト
         SetUpTextEvent(movePageText.gameObject,
-                        (eventData) => { StartColorChange(movePageText, highlightColor); },
-                        (eventData) => { StartColorChange(movePageText, defaultColor); },
+                        (eventData) => { ChangeWhiteText(movePageText); },
+                        (eventData) => { ResetWhiteText(movePageText); },
                         (eventData) => {
                             movePage?.Invoke(eventData);
                             OpenPage();
                         });
         //ページを閉じるテキスト
         SetUpTextEvent(backPageText.gameObject,
-                        (eventData) => { StartColorChange(backPageText, highlightColor); },
-                        (eventData) => { StartColorChange(backPageText, backTextDefaultColor); },
+                        (eventData) => { ChangeBlackText(backPageText); },
+                        (eventData) => { ResetBlackText(backPageText); },
                         (eventData) => { ClosePage(); });
     }
 
-    // Update is called once per frame
+    // Update is called once for frame
     void Update()
     {
 
-    }
-    /// <summary>
-    /// ページに移るテキストの処理を設定
-    /// </summary>
-    /// <param name="_text">テキスト</param>
-    /// <param name="_enterAction">テキストの上にマウスを置いたとき</param>
-    /// <param name="_exitAction">テキストからマウスを離したとき</param>
-    /// <param name="_clickAction">テキストをクリックしたら</param>
-    protected void SetUpTextEvent(GameObject _text, UnityAction<BaseEventData> _enterAction, UnityAction<BaseEventData> _exitAction, UnityAction<BaseEventData> _clickAction)
-    {
-        AddEventTrigger(_text, EventTriggerType.PointerEnter, _enterAction);
-        AddEventTrigger(_text, EventTriggerType.PointerExit, _exitAction);
-        AddEventTrigger(_text, EventTriggerType.PointerClick, _clickAction);
-    }
-    /// <summary>
-    /// テキストの色を徐々に変える処理
-    /// </summary>
-    /// <param name="_text">テキスト</param>
-    /// <param name="_targetColor">どの色に変えるか</param>
-    /// <param name="_duration">色が変わる時間</param>
-    /// <returns></returns>
-    private IEnumerator ChangeTextColorOverTime(TextMeshProUGUI _text, Color32 _targetColor, float _duration)
-    {
-        Color32 startColor = _text.color;
-        float _elapsed = 0f;
-
-        while (_elapsed < _duration)
-        {
-            _elapsed += Time.deltaTime;
-            float _t = _elapsed / _duration;
-            _text.color = Color.Lerp(startColor, _targetColor, _t);
-            _text.fontMaterial.SetColor(textColor, _text.color); // マテリアルの色も補間
-            yield return null;
-        }
-
-        _text.color = _targetColor; // 最終色に設定
-        _text.fontMaterial.SetColor(textColor, _targetColor);
-    }
-    /// <summary>
-    /// テキストの色を変える
-    /// </summary>
-    /// <param name="_text">テキスト</param>
-    /// <param name="_changeColor">変更する色</param>
-    protected void StartColorChange(TextMeshProUGUI _text, Color32 _changeColor)
-    {
-        currentColorChangeCoroutine = StartCoroutine(ChangeTextColorOverTime(_text, _changeColor, colorChangeDuration));
     }
 
     /// <summary>
@@ -134,20 +84,6 @@ public class UIPageMove : MonoBehaviour
         AddEventTrigger(_arrow, EventTriggerType.PointerEnter, _enterAction);
         AddEventTrigger(_arrow, EventTriggerType.PointerExit, _exitAction);
         AddEventTrigger(_arrow, EventTriggerType.PointerClick, _clickAction);
-    }
-
-    /// <summary>
-    /// イベントトリガーの処理をつける
-    /// </summary>
-    /// <param name="_target">UI</param>
-    /// <param name="_eventType">イベントトリガーの何を使うか</param>
-    /// <param name="_action">実行したい関数</param>
-    protected void AddEventTrigger(GameObject _target, EventTriggerType _eventType, UnityAction<BaseEventData> _action)
-    {
-        EventTrigger _trigger = _target.GetComponent<EventTrigger>() ?? _target.AddComponent<EventTrigger>();
-        EventTrigger.Entry _entry = new EventTrigger.Entry { eventID = _eventType };
-        _entry.callback.AddListener(_action);
-        _trigger.triggers.Add(_entry);
     }
 
     /// <summary>
@@ -189,7 +125,7 @@ public class UIPageMove : MonoBehaviour
         uiPageList[currentPage].SetActive(true);
         leftArrow.SetActive(true);
 
-        if(currentPage == maxPageNum) rightArrow.SetActive(false); //最後のページの時
+        if (currentPage == maxPageNum) rightArrow.SetActive(false); //最後のページの時
         else rightArrow.SetActive(true);
 
         SoundManager.Instance.PlaySE(SESource.riceCakeUnionAndButton);
