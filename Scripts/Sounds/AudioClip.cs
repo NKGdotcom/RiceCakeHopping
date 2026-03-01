@@ -1,0 +1,32 @@
+using System;
+using UnityEngine;
+
+/// <summary>
+/// BGMÇÃâπåπÇê›íË
+/// </summary>
+[System.Serializable]
+public enum BGMSource
+{
+    title,
+    stageBGM
+}
+/// <summary>
+/// SEÇÃâπåπÇê›íË
+/// </summary>
+[System.Serializable]
+public enum SESource
+{
+    backButton,
+    cut,
+    eat,
+    hoppingMove,
+    notEat,
+    notEnough,
+    riceCakeCollision,
+    riceCakeUnion,
+    soDelicious,
+    somethingGotIn,
+    tooMuch,
+    veryDelicious,
+    button
+}
