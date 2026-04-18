@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
 /// <summary>
-/// 味付けができるスクリプトをつける際に必要なインタフェース
+/// お餅に味付けの機能を持たせるためのインタフェース
 /// </summary>
 public interface IRicecakeFlavoring
 {
+    /// <summary>
+    /// このオブジェクトが持つ味付けの種類
+    /// </summary>
     RicecakeType MyType { get; }
 }
