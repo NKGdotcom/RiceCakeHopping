@@ -2,51 +2,55 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//往復運動
+/// <summary>
+/// 指定された2つのポイントの間を、一定の速度で往復運動するギミック。
+/// </summary>
 public class ReciprocatingMotion : MonoBehaviour
 {
+    [Header("移動設定")]
+    [Tooltip("移動する速さ")]
     [SerializeField] private float moveSpeed;
 
+    [Header("移動範囲")]
+    [Tooltip("移動の始点となるポイント")]
     [SerializeField] private Transform startPoint;
+    [Tooltip("移動の終点となるポイント")]
     [SerializeField] private Transform finalPoint;
 
-    private bool isReturn;
+    [Header("判定設定")]
+    [Tooltip("目的地に到達したと判定する距離")]
+    [SerializeField] private float arrivalThreshold = 0.01f;
 
-    private Vector3 objPos;
-    private Vector3 initialPos;
+    private bool isHeadingToFinal = true;
 
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        initialPos = objPos = transform.position;
+        if(startPoint == null) { Debug.LogError("startPointが参照されていません"); return; }
+        if(finalPoint == null) { Debug.LogError("finalPointが参照されていません"); return; }
     }
 
-    // Update is called once per frame
     void Update()
     {
         Move();
     }
 
-    //往復運動の移動
+    /// <summary>
+    /// 往復運動の移動
+    /// </summary>
     private void Move()
     {
-        if (!isReturn)
+        //現在向かうべき目的地をフラグから決定
+        Transform _targetPoint = isHeadingToFinal ? finalPoint : startPoint;
+
+        transform.position = Vector3.MoveTowards(
+            transform.position,
+            _targetPoint.position,
+            moveSpeed * Time.deltaTime
+         );
+
+        if(Vector3.Distance(transform.position, _targetPoint.position) < arrivalThreshold)
         {
-            objPos.x += Time.deltaTime * moveSpeed;
-            transform.position = objPos;
-            if (objPos.x > finalPoint.position.x)
-            {
-                isReturn = true;
-            }
-        }
-        else
-        {
-            objPos.x -= Time.deltaTime * moveSpeed;
-            transform.position = objPos;
-            if (objPos.x < startPoint.position.x)
-            {
-                isReturn = false;
-            }
+            isHeadingToFinal = !isHeadingToFinal;
         }
     }
 }

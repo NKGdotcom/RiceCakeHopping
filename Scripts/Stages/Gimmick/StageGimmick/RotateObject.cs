@@ -3,18 +3,22 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// オブジェクトの回転ギミック
+/// オブジェクトを回転させるギミックのクラス
 /// </summary>
 public class RotateObject : MonoBehaviour
 {
+    [Header("回転設定")]
+    [Tooltip("回転する速さ")]
     [SerializeField] private float rotateSpeed = 50;
 
-    // Update is called once per frame
     void Update()
     {
         Rotate();
     }
 
+    /// <summary>
+    /// その場で回転
+    /// </summary>
     private void Rotate()
     {
         transform.Rotate(0f, rotateSpeed * Time.deltaTime, 0f);

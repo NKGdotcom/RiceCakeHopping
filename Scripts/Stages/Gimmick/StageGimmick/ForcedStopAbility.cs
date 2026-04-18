@@ -1,16 +1,15 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 壁などでとどめたいところでつける
+/// お餅を強制的に停止させるギミックのクラス
 /// </summary>
 public class ForcedStopAbility : MonoBehaviour
 {
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision collision)
     {
-        if(TryGetComponent<IRiceCake>(out var _ricacake))
+        if (collision.gameObject.TryGetComponent<IRiceCake>(out var _ricacake))
         {
+            //お餅を持っていたら強制停止させる
             _ricacake.StopRicecake();
         }
     }
