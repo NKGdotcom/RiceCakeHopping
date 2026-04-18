@@ -2,15 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-
+/// <summary>
+/// シングルトンで音を鳴らす役割を持つもの
+/// </summary>
 public class SoundManager : MonoBehaviour
 {
+    public static SoundManager Instance { get; private set; }
+
+    [Header("音関連")]
+    [Tooltip("BGMを鳴らすためのオーディオソース")]
     [SerializeField] private AudioSource bgmAudioSource;
+    [Tooltip("SEを鳴らすためのオーディオソース")]
     [SerializeField] private AudioSource seAudioSource;
+    [Tooltip("音がデータとして保存してあるリスト")]
     [SerializeField] private SoundList soundList;
+    [Tooltip("音量調節をするクラス")]
     [SerializeField] private SoundVolume soundVolume;
 
-    public static SoundManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -24,6 +32,11 @@ public class SoundManager : MonoBehaviour
             Debug.LogError("SoundVolume ScriptableObjectがSoundManagerに割り当てられていません。");
         }
     }
+
+    /// <summary>
+    /// BGMを鳴らす
+    /// </summary>
+    /// <param name="_bgmSource"></param>
     public void PlayBGM(BGMSource _bgmSource)
     {
         SoundList.BGMSoundData bgmData = soundList.GetBGMData(_bgmSource);
@@ -56,16 +69,28 @@ public class SoundManager : MonoBehaviour
         seAudioSource.volume = soundVolume.SEVolume;
     }
 
+    /// <summary>
+    /// BGMの初期値を設定
+    /// </summary>
+    /// <param name="_slider"></param>
     public void InitialSetBGMSlider(Slider _slider)
     {
         _slider.value = soundVolume.BGMVolume;
     }
 
+    /// <summary>
+    /// SEの初期値を設定
+    /// </summary>
+    /// <param name="_slider"></param>
     public void InitialSetSESlider(Slider _slider)
     {
         _slider.value = soundVolume.SEVolume;
     }
 
+    /// <summary>
+    /// SEを流す
+    /// </summary>
+    /// <param name="_seSource"></param>
     public void PlaySE(SESource _seSource)
     {
         SoundList.SESoundData seData = soundList.GetSEData(_seSource);

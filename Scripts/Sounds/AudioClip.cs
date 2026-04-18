@@ -16,17 +16,17 @@ public enum BGMSource
 [System.Serializable]
 public enum SESource
 {
-    backButton,
-    cut,
-    eat,
-    hoppingMove,
-    notEat,
-    notEnough,
-    riceCakeCollision,
-    riceCakeUnion,
-    soDelicious,
-    somethingGotIn,
-    tooMuch,
-    veryDelicious,
-    button
+    BACK_BUTTON,
+    CUT,
+    EAT,
+    HOPPING_MOVE,
+    NOT_EAT,
+    NOT_ENOUGH,
+    RICE_CAKE_COLLISION,
+    RICE_CAKE_UNION,
+    SO_DELICIOUS,
+    SOMETHING_GOT_IN,
+    TOO_MUCH,
+    VERY_DELICIOUS,
+    BUTTON,
 }
