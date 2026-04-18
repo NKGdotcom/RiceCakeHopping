@@ -3,60 +3,54 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ホッピングの動きを管理するクラス
-/// 基本はここでのみStartやUpdateを使う
+/// ホッピングの挙動を統括するコントローラー
 /// </summary>
 public class HoppingController : MonoBehaviour
 {
+    [Header("データ")]
+    [Tooltip("ホッピングの挙動パラメータ")]
     [SerializeField] private HoppingData hoppingData;
 
+    [Header("各機能の挙動")]
+    [Tooltip("ホッピングの移動挙動")]
     [SerializeField] private HoppingMovement hoppingMovement;
+    [Tooltip("ホッピングのジャンプ挙動")]
     [SerializeField] private HoppingJump hoppingJump;
+    [Tooltip("ホッピングの足元の影")]
     [SerializeField] private HoppingShadowFeet hoppingShadowFeet;
 
     // Start is called before the first frame update
     void Awake()
     {
         if (hoppingData == null) { Debug.LogError("hoppingDataが参照されていません"); return; }
-        if (hoppingMovement == null) { TryGetComponent<HoppingMovement>(out hoppingMovement); }
-        if (hoppingJump == null) { TryGetComponent<HoppingJump>(out hoppingJump); }
+        if (hoppingMovement == null) { Debug.LogError("hoppingMovementが参照されていません"); return; }
+        if (hoppingJump == null) { Debug.LogError("hoppingJumpが参照されていません"); return; }
         if(hoppingShadowFeet == null) { Debug.LogError("hoppingShadowFeetが参照されていません"); return; }
         
+        //データを渡してパラメータなどを引き渡す
         hoppingMovement.SetUp(hoppingData);
         hoppingJump.SetUp(hoppingData);
     }
 
-    // Update is called once per frame
     void Update()
     {
+        //毎フレーム移動・傾き
         hoppingMovement.HoppingMoveTilt();
 
-        UpdateShadow();
-    }
-
-    //下から伸ばされたRayがホッピングにあたっているか
-    //ホッピングの足元に影を置くため
-    private void UpdateShadow()
-    {
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, Mathf.Infinity))
-        {
-            hoppingShadowFeet.ShowShadow();
-            hoppingShadowFeet.FeetShadow(hit);
-        }
-        else
-        {
-            hoppingShadowFeet.HideShadow();
-        }
+        //影の更新
+        hoppingShadowFeet.UpdateShadow();
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        //何かにぶつかったらジャンプ処理
         hoppingJump.HoppingJumpMovement();
 
-        if(collision.gameObject.TryGetComponent<IRiceCake>(out var _ricecake))
+        if (collision.gameObject.TryGetComponent<IRiceCake>(out var _ricecake))
         {
+            //餅に触れたら吹き飛ばす
             _ricecake.OnHitByHopping(collision);
-            SoundManager.Instance.PlaySE(SESource.riceCakeCollision);
+            SoundManager.Instance.PlaySE(SESource.RICE_CAKE_COLLISION);
         }
     }
 }

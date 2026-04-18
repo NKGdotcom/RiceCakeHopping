@@ -3,31 +3,40 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ホッピングの移動について
-/// ホッピングは傾いたら移動
+/// ホッピングを傾けたら移動する挙動
 /// </summary>
 public class HoppingMovement : MonoBehaviour
 {
-    private float rotationSpeed;
-    private float smoothRotation;
+    [Header("パラメータ設定(デバッグ用)")]
+    [Tooltip("傾きのスピード")]
+    [SerializeField] private float rotationSpeed;
+    [Tooltip("傾ける滑らかさ")]
+    [SerializeField] private float smoothRotation;
+
+    //ホッピングの傾き情報
     private float currentXRot;
     private float currentZRot;
 
+    /// <summary>
+    /// 初期データのパラメータ設定
+    /// </summary>
+    /// <param name="_data"></param>
     public void SetUp(HoppingData _data)
     {
         rotationSpeed = _data.RotationSpeed;
         smoothRotation = _data.SmoothRotation;
     }
 
-    //傾きを動かす
-    //_targetRotはinput×rotationSpeedの値を少しずつ加算や減算し、
-    //回転を現在回転位置から近づける
-    //(完全に近づくことはないが、近づくほど回転が遅くなる)
+    /// <summary>
+    /// ホッピングを傾けながらの移動挙動
+    /// </summary>
     public void HoppingMoveTilt()
     {
+        //GetAxisを通じて傾きを滑らかに回転できるように
         float _targetXRot = Input.GetAxis("Vertical") * rotationSpeed;
         float _targetZRot = -Input.GetAxis("Horizontal") * rotationSpeed;
 
+        //線形を用いた滑らかな傾きの移動
         currentXRot = Mathf.Lerp(currentXRot, _targetXRot, Time.deltaTime * smoothRotation);
         currentZRot = Mathf.Lerp(currentZRot, _targetZRot, Time.deltaTime * smoothRotation);
 
