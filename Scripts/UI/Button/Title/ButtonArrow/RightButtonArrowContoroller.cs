@@ -4,14 +4,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 右矢印ボタン
+/// 遊び方のページで押すと1ページ分進む
 /// </summary>
 public class RightButtonArrowContoroller : BaseButton
 {
-    public event Action ProceedPage;
+    /// <summary>
+    /// ボタンを押したことを知らせる
+    /// </summary>
+    public event Action OnClicked;
 
+    /// <summary>
+    /// ボタンを押すと次のページに進む
+    /// </summary>
     public override void ButtonClick()
     {
-        ProceedPage?.Invoke();
+        SoundManager.Instance.PlaySE(SESource.BUTTON);
+        OnClicked?.Invoke();
     }
 }
