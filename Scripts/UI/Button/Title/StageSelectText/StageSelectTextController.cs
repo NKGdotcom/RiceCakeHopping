@@ -8,8 +8,12 @@ using UnityEngine;
 /// </summary>
 public class StageSelectTextController : BaseButton
 {
+    [Header("コンポーネント参照")]
+    [Tooltip("テキストの色を変えるアニメーション")]
     [SerializeField] private TextAnimation textAnimation;
+    [Tooltip("タイトル画面のアニメーション")]
     [SerializeField] private TitleAnimation titleAnimation;
+    [Tooltip("ステージ選択画面のページ管理")]
     [SerializeField] private PageController stageSelectPageController;
 
     void Awake()
@@ -19,25 +23,30 @@ public class StageSelectTextController : BaseButton
         if (stageSelectPageController == null) { Debug.LogError("stageSelectPageControllerが参照されていません"); return; }
     }
 
+    /// <summary>
+    /// ボタンの上にマウスを置いたら色を変える
+    /// </summary>
     public override void ButtonEnter()
     {
         textAnimation.RedChangeColor();
     }
 
+    /// <summary>
+    /// ボタンの上からマウスを離したら色を元に戻す
+    /// </summary>
     public override void ButtonExit()
     {
         textAnimation.RedChangeDefaultColor();
     }
 
+    /// <summary>
+    /// ボタンの上でマウスをクリックしたら次のステージに遷移
+    /// </summary>
     public override void ButtonClick()
     {
-        OpenStageSelectPage();
-    }
+        SoundManager.Instance.PlaySE(SESource.BUTTON);
 
-    //ステージセレクトのページを開く
-    private void OpenStageSelectPage()
-    {
-        SoundManager.Instance.PlaySE(SESource.button);
+        //ステージ選択画面に移る
         titleAnimation.MovetoStageSelectPage();
         stageSelectPageController.SetPage();
     }
