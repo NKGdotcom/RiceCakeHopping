@@ -5,17 +5,26 @@ using System.Threading;
 using UnityEngine;
 
 /// <summary>
-/// フェードアウト用のスクリプト
+/// フェードアウトの管理
 /// </summary>
 public class FadeOutController : MonoBehaviour
 {
+    [Header("アニメーション")]
+    [Tooltip("フェードアウトアニメーション")]
     [SerializeField] private Animator fadeAnimator;
-    private float fadeoutSpeed = 0.5f;
+
+    //フェードアウトをした後一瞬待機
+    private float fadeoutDelay = 0.5f;
     private const string STR_FADE_OUT = "FadeOut";
 
+    /// <summary>
+    /// フェードアウトが完了するまで待機する非同期処理
+    /// </summary>
+    /// <param name="_token"></param>
+    /// <returns></returns>
     public async UniTask WaitFadeOutAsync( CancellationToken _token)
     {
         fadeAnimator.SetTrigger(STR_FADE_OUT);
-        await UniTask.WaitForSeconds(fadeoutSpeed, cancellationToken: _token);
+        await UniTask.WaitForSeconds(fadeoutDelay, cancellationToken: _token);
     }
 }
